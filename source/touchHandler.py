@@ -1,8 +1,8 @@
-#touchHandler.py
-#A part of NonVisual Desktop Access (NVDA)
-#This file is covered by the GNU General Public License.
-#See the file COPYING for more details.
-#Copyright (C) 2012-2018 NV Access Limited, Joseph Lee, Babbage B.V.
+# touchHandler.py
+# A part of NonVisual Desktop Access (NVDA)
+# This file is covered by the GNU General Public License.
+# See the file COPYING for more details.
+# Copyright (C) 2012-2019 NV Access Limited, Joseph Lee, Babbage B.V.
 
 """handles touchscreen interaction (Windows 8 and later).
 Used to provide input gestures for touchscreens, touch modes and other support facilities.
@@ -300,7 +300,7 @@ def touchSupported():
 	if not config.isInstalledCopy():
 		log.debugWarning("Touch only supported on installed copies")
 		return False
-	if (winVersion.winVersion.major*10+winVersion.winVersion.minor)<62:
+	if winVersion.winVersion.platform_version < (6, 2, 9200):
 		log.debugWarning("Touch only supported on Windows 8 and higher")
 		return False
 	maxTouches=windll.user32.GetSystemMetrics(SM_MAXIMUMTOUCHES)
@@ -313,8 +313,12 @@ def initialize():
 	global handler
 	if not touchSupported():
 		raise NotImplementedError
-	handler=TouchHandler()
-	log.debug("Touch support initialized. maximum touch inputs: %d"%windll.user32.GetSystemMetrics(SM_MAXIMUMTOUCHES))
+	log.debug("Touchscreen detected, maximum touch inputs: %d"%windll.user32.GetSystemMetrics(SM_MAXIMUMTOUCHES))
+	if config.conf["touch"]["enabled"]:
+		handler=TouchHandler()
+		log.debug("Touch support enabled.")
+	else:
+		log.debug("Touch support disabled.")
 
 def terminate():
 	global handler
